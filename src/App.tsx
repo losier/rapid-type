@@ -1,33 +1,40 @@
-import { faker } from "@faker-js/faker";
-
 import GenerateWords from "./components/GenerateWords";
 import RestartButton from "./components/RestartButton";
 import Result from "./components/Result";
+import UserTyping from "./components/UserTyping";
+import WordsContainer from "./components/WordsContainer";
+import CountdownTimer from "./components/CountdownTimer";
 
-const words = faker.random.words(10);
+import useEngine from "./hooks/useEngine";
+import { calculateAccuracyPercentage } from "./utils/helpers";
 
-function App() {
+const App = () => {
+  const { words, typed, timeLeft, errors, state, restart, totalTyped } =
+    useEngine();
+
   return (
     <>
-      <CountDownTimer timeLeft={30} />
-      <GenerateWords words={words} />
+      <CountdownTimer timeLeft={timeLeft} />
+      <WordsContainer>
+        <GenerateWords key={words} words={words} />
+        <UserTyping
+          className="absolute inset-0"
+          words={words}
+          userInput={typed}
+        />
+      </WordsContainer>
       <RestartButton
         className={"mx-auto mt-10 text-slate-500"}
-        onRestart={() => null}
+        onRestart={restart}
       />
       <Result
-        errors={2}
-        accuracyPercentage={98}
-        total={100}
-        className={"mt-10"}
+        className="mt-10"
+        state={state}
+        errors={errors}
+        accuracyPercentage={calculateAccuracyPercentage(errors, totalTyped)}
+        total={totalTyped}
       />
     </>
-  );
-}
-
-const CountDownTimer = ({ timeLeft }: { timeLeft: number }) => {
-  return (
-    <h2 className="text-primary-400 font-medium">Time left: {timeLeft}</h2>
   );
 };
 
